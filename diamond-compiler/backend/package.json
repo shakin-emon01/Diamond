@@ -7,7 +7,7 @@
     "dev": "node src/server.js",
     "start": "node ./scripts/start-production.mjs",
     "start:cluster": "node ./scripts/start-cluster.mjs",
-    "test": "node --test ./tests/backend.test.js"
+    "test": "node --test"
   },
   "dependencies": {
     "compression": "^1.8.1",
