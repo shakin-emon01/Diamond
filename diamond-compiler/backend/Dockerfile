@@ -3,7 +3,7 @@ FROM debian:bookworm-slim AS compiler-build
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      flex bison gcc libc6-dev make && \
+      flex bison gcc libc6-dev make libfl-dev && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
