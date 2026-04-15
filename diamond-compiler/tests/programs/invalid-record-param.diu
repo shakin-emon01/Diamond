@@ -1,0 +1,12 @@
+gothon Person {
+    shonkha age;
+}
+
+kaj khali show(Person user) {
+    dekhao(user.age);
+    ferot;
+}
+
+shuru
+
+shesh

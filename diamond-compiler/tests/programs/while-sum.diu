@@ -1,0 +1,18 @@
+shuru
+
+dhoro shonkha n;
+dhoro shonkha i;
+dhoro shonkha total;
+
+nao(n);
+i = 1;
+total = 0;
+
+jotokhon (i <= n) {
+    total = total + i;
+    i = i + 1;
+}
+
+dekhao(total);
+
+shesh

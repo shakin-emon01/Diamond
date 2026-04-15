@@ -1,0 +1,23 @@
+[
+  {
+    "id": "record-profile-native",
+    "file": "programs/record-profile.diu",
+    "expectedSuccess": true,
+    "expectedPreprocessRecordTypes": 2,
+    "expectedPreprocessRecordVariables": 1,
+    "containsSymbol": ["user__age", "user__home__city", "user__home__zip"]
+  },
+  {
+    "id": "import-main",
+    "file": "programs/import-main.diu",
+    "expectedSuccess": true,
+    "expectedPreprocessImports": 1,
+    "containsSymbol": ["jog"]
+  },
+  {
+    "id": "invalid-record-param",
+    "file": "programs/invalid-record-param.diu",
+    "expectedSuccess": false,
+    "expectedErrorIncludes": "Record-typed function parameters are not supported yet"
+  }
+]

@@ -1,0 +1,20 @@
+gothon Address {
+    lekha city;
+    shonkha zip;
+}
+
+gothon Person {
+    shonkha age;
+    Address home;
+}
+
+shuru
+
+dhoro Person user;
+user.age = 25;
+user.home.city = "Dhaka";
+user.home.zip = 1207;
+dekhao(user.home.city);
+dekhao(user.home.zip);
+
+shesh

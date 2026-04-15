@@ -1,0 +1,9 @@
+kaj jog(a, b) {
+    ferot a + b;
+}
+
+shuru
+
+dekhao(jog(6, 7));
+
+shesh

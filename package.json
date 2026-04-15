@@ -1,0 +1,14 @@
+{
+  "name": "diamond-compiler-workspace",
+  "private": true,
+  "scripts": {
+    "build:native": "node ./diamond-compiler/scripts/build-native.mjs",
+    "lint": "npm --prefix diamond-ide run lint",
+    "test": "npm run test:native && npm run test:unit && npm run test:backend",
+    "test:native": "npm run build:native && node ./diamond-compiler/tests/run-native-regression.mjs",
+    "test:unit": "npm --prefix diamond-ide run test:unit",
+    "test:backend": "npm --prefix diamond-compiler/backend run test",
+    "test:e2e": "npm --prefix diamond-ide run test:e2e",
+    "sync:wasm": "npm --prefix diamond-ide run sync:wasm"
+  }
+}

@@ -1,0 +1,26 @@
+kaj lekha banner(lekha name) {
+    ferot jora("Diamond ", name);
+}
+
+kaj khali show_stats(lekha text) {
+    dekhao(text);
+    dekhao(dairgho(text));
+    ferot;
+}
+
+shuru
+
+dhoro auto title = banner("Compiler");
+dhoro shonkha cmp;
+dhoro lekha sliced;
+
+cmp = tulona(title, "Diamond Compiler");
+sliced = ongsho(title, 8, 8);
+
+dekhao(title + "!");
+show_stats(sliced);
+dekhao(boro(5, 12));
+dekhao(porom(-9));
+dekhao(cmp);
+
+shesh

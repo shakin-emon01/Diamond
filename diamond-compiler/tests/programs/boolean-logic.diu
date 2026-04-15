@@ -1,0 +1,18 @@
+shuru
+
+dhoro shonkha marks;
+dhoro shonkha attendance;
+dhoro shotto eligible;
+
+nao(marks);
+nao(attendance);
+
+eligible = marks >= 85 ebong attendance >= 90;
+
+jodi (eligible) {
+    dekhao("Scholarship");
+} naile {
+    dekhao("Standard");
+}
+
+shesh

@@ -1,0 +1,16 @@
+shuru
+
+dhoro shonkha marks;
+nao(marks);
+
+jodi (marks >= 40) {
+    jodi (marks >= 80) {
+        dekhao("Distinction");
+    } naile {
+        dekhao("Pass");
+    }
+} naile {
+    dekhao("Fail");
+}
+
+shesh

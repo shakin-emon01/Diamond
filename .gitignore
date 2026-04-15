@@ -1,0 +1,24 @@
+node_modules/
+.next/
+out/
+dist/
+coverage/
+playwright-report/
+test-results/
+.tools/
+*.log
+.env
+.env.local
+.env.*.local
+Thumbs.db
+.DS_Store
+diamond-compiler/tmp-preprocess-test/
+diamond-compiler/.tooling/
+
+# Generated compiler files (rebuild with flex/bison)
+diamond-compiler/core/lex.yy.c
+diamond-compiler/core/parser.tab.c
+diamond-compiler/core/parser.tab.h
+
+# Pre-built binary (build from source instead)
+diamond-compiler/diamond.exe

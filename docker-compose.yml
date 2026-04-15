@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./diamond-compiler
+      dockerfile: backend/Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      PORT: "4000"
+      CORS_ORIGIN: "http://localhost:3000"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 512M
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=64m
+
+  ide:
+    build:
+      context: ./diamond-ide
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: "http://backend:4000"
+    depends_on:
+      - backend
+    restart: unless-stopped

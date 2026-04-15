@@ -1,0 +1,17 @@
+shuru
+
+dhoro lekha reversed;
+dhoro shonkha parsed;
+dhoro shonkha remainder;
+
+reversed = ulto("diamond");
+parsed = shonkhakor("42");
+remainder = vagshesh(17, 5);
+
+dekhao(reversed);
+dekhao(parsed);
+dekhao(remainder);
+dekhao(gol(3.6));
+dekhao(lekhakor(8));
+
+shesh

@@ -1,0 +1,139 @@
+{
+  "generatedAt": "2026-04-15T19:18:00.632Z",
+  "binaryPath": "D:\\Projects\\Compiler Project\\diamond-compiler\\diamond.exe",
+  "total": 13,
+  "passed": 13,
+  "failed": 0,
+  "results": [
+    {
+      "id": "hello-world",
+      "file": "tests\\programs\\hello-world.diu",
+      "passed": true,
+      "success": true,
+      "errors": 0,
+      "preprocessImports": 0,
+      "preprocessRecordTypes": 0,
+      "preprocessRecordVariables": 0
+    },
+    {
+      "id": "branch-pass",
+      "file": "tests\\programs\\branch-pass.diu",
+      "passed": true,
+      "success": true,
+      "errors": 0,
+      "preprocessImports": 0,
+      "preprocessRecordTypes": 0,
+      "preprocessRecordVariables": 0
+    },
+    {
+      "id": "nested-grade",
+      "file": "tests\\programs\\nested-grade.diu",
+      "passed": true,
+      "success": true,
+      "errors": 0,
+      "preprocessImports": 0,
+      "preprocessRecordTypes": 0,
+      "preprocessRecordVariables": 0
+    },
+    {
+      "id": "while-sum",
+      "file": "tests\\programs\\while-sum.diu",
+      "passed": true,
+      "success": true,
+      "errors": 0,
+      "preprocessImports": 0,
+      "preprocessRecordTypes": 0,
+      "preprocessRecordVariables": 0
+    },
+    {
+      "id": "array-total",
+      "file": "tests\\programs\\array-total.diu",
+      "passed": true,
+      "success": true,
+      "errors": 0,
+      "preprocessImports": 0,
+      "preprocessRecordTypes": 0,
+      "preprocessRecordVariables": 0
+    },
+    {
+      "id": "function-call",
+      "file": "tests\\programs\\function-call.diu",
+      "passed": true,
+      "success": true,
+      "errors": 0,
+      "preprocessImports": 0,
+      "preprocessRecordTypes": 0,
+      "preprocessRecordVariables": 0
+    },
+    {
+      "id": "boolean-logic",
+      "file": "tests\\programs\\boolean-logic.diu",
+      "passed": true,
+      "success": true,
+      "errors": 0,
+      "preprocessImports": 0,
+      "preprocessRecordTypes": 0,
+      "preprocessRecordVariables": 0
+    },
+    {
+      "id": "record-profile",
+      "file": "tests\\programs\\record-profile.diu",
+      "passed": true,
+      "success": true,
+      "errors": 0,
+      "preprocessImports": 0,
+      "preprocessRecordTypes": 2,
+      "preprocessRecordVariables": 1
+    },
+    {
+      "id": "builtin-library",
+      "file": "tests\\programs\\builtin-library.diu",
+      "passed": true,
+      "success": true,
+      "errors": 0,
+      "preprocessImports": 0,
+      "preprocessRecordTypes": 0,
+      "preprocessRecordVariables": 0
+    },
+    {
+      "id": "invalid-missing-semicolon",
+      "file": "tests\\programs\\invalid-missing-semicolon.diu",
+      "passed": true,
+      "success": false,
+      "errors": 2,
+      "preprocessImports": 0,
+      "preprocessRecordTypes": 0,
+      "preprocessRecordVariables": 0
+    },
+    {
+      "id": "record-profile-native",
+      "file": "tests\\programs\\record-profile.diu",
+      "passed": true,
+      "success": true,
+      "errors": 0,
+      "preprocessImports": 0,
+      "preprocessRecordTypes": 2,
+      "preprocessRecordVariables": 1
+    },
+    {
+      "id": "import-main",
+      "file": "tests\\programs\\import-main.diu",
+      "passed": true,
+      "success": true,
+      "errors": 0,
+      "preprocessImports": 1,
+      "preprocessRecordTypes": 0,
+      "preprocessRecordVariables": 0
+    },
+    {
+      "id": "invalid-record-param",
+      "file": "tests\\programs\\invalid-record-param.diu",
+      "passed": true,
+      "success": false,
+      "errors": 1,
+      "preprocessImports": 0,
+      "preprocessRecordTypes": 1,
+      "preprocessRecordVariables": 0
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+kaj jog(a, b) {
+    dhoro shonkha total;
+    total = a + b;
+    ferot total;
+}
+
+shuru
+
+dhoro shonkha a;
+dhoro doshomik price;
+dhoro lekha name;
+dhoro shotto ready;
+dhoro shonkha arr[5];
+
+a = 5;
+price = 7.5;
+name = "Diamond";
+ready = shotto;
+arr[0] = jog(a, 3);
+
+jodi (ready ebong a < 10) {
+    dekhao(name);
+} naile {
+    dekhao("fallback");
+}
+
+jotokhon (a < 8) {
+    a = a + 1;
+}
+
+ghurao (a = 0; a < 3; a = a + 1) {
+    dekhao(arr[0]);
+}
+
+shesh

@@ -1,0 +1,12 @@
+shuru
+
+dhoro shonkha a;
+dhoro lekha name;
+
+a = "oops";
+b = 5;
+jodi (a) {
+    dekhao(name)
+}
+
+shesh

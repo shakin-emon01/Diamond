@@ -1,0 +1,72 @@
+[
+  {
+    "id": "hello-world",
+    "file": "hello-world.diu",
+    "expectedSuccess": true,
+    "stdin": "",
+    "expectedLines": ["Hello Diamond"]
+  },
+  {
+    "id": "branch-pass",
+    "file": "branch-pass.diu",
+    "expectedSuccess": true,
+    "stdin": "82",
+    "expectedLines": ["Pass"]
+  },
+  {
+    "id": "nested-grade",
+    "file": "nested-grade.diu",
+    "expectedSuccess": true,
+    "stdin": "88",
+    "expectedLines": ["Distinction"]
+  },
+  {
+    "id": "while-sum",
+    "file": "while-sum.diu",
+    "expectedSuccess": true,
+    "stdin": "5",
+    "expectedLines": ["15"]
+  },
+  {
+    "id": "array-total",
+    "file": "array-total.diu",
+    "expectedSuccess": true,
+    "stdin": "2\n4\n6",
+    "expectedLines": ["12"]
+  },
+  {
+    "id": "function-call",
+    "file": "function-call.diu",
+    "expectedSuccess": true,
+    "stdin": "",
+    "expectedLines": ["13"]
+  },
+  {
+    "id": "boolean-logic",
+    "file": "boolean-logic.diu",
+    "expectedSuccess": true,
+    "stdin": "88\n92",
+    "expectedLines": ["Scholarship"]
+  },
+  {
+    "id": "record-profile",
+    "file": "record-profile.diu",
+    "expectedSuccess": true,
+    "stdin": "",
+    "expectedLines": ["Dhaka", "1207"]
+  },
+  {
+    "id": "builtin-library",
+    "file": "builtin-library.diu",
+    "expectedSuccess": true,
+    "stdin": "",
+    "expectedLines": ["dnomaid", "42", "2", "4", "8"]
+  },
+  {
+    "id": "invalid-missing-semicolon",
+    "file": "invalid-missing-semicolon.diu",
+    "expectedSuccess": false,
+    "stdin": "",
+    "expectedLines": []
+  }
+]

@@ -1,0 +1,16 @@
+shuru
+
+dhoro shonkha i;
+dhoro shonkha total;
+dhoro shonkha nums[3];
+
+total = 0;
+
+ghurao (i = 0; i < 3; i = i + 1) {
+    nao(nums[i]);
+    total = total + nums[i];
+}
+
+dekhao(total);
+
+shesh

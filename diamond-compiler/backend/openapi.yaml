@@ -1,0 +1,274 @@
+openapi: "3.1.0"
+info:
+  title: Diamond Compiler API
+  version: "1.1.0"
+  description: |
+    REST API for server-side Diamond language compilation.
+    The compiler accepts `.diu` source code and returns a structured JSON response
+    containing tokens, AST, symbol table, TAC, assembly, and diagnostics.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:4000
+    description: Local development
+  - url: https://diamond-api.example.com
+    description: Production
+
+paths:
+  /api/v1/health:
+    get:
+      summary: Full health check
+      description: Returns service status, compiler availability, and configuration limits.
+      operationId: getHealth
+      responses:
+        "200":
+          description: Service is running
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /api/v1/health/live:
+    get:
+      summary: Liveness probe
+      description: Returns 200 if the server process is alive. For orchestrator liveness checks.
+      operationId: getLive
+      responses:
+        "200":
+          description: Process is alive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: diamond-backend
+
+  /api/v1/health/ready:
+    get:
+      summary: Readiness probe
+      description: Returns 200 when the compiler binary is available. Returns 503 otherwise.
+      operationId: getReady
+      responses:
+        "200":
+          description: Compiler is ready
+        "503":
+          description: Compiler binary not found
+
+  /api/v1/compile:
+    post:
+      summary: Compile Diamond source code
+      description: |
+        Accepts Diamond source code and returns structured compilation results
+        including tokens, AST, symbol table, TAC, assembly, and diagnostics.
+      operationId: postCompile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompileRequest"
+      responses:
+        "200":
+          description: Compilation completed (may contain errors in the response body)
+          headers:
+            X-Request-Id:
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompileResponse"
+        "400":
+          description: Invalid request (missing or empty code)
+        "408":
+          description: Compilation timed out
+        "413":
+          description: Source code too large
+        "429":
+          description: Rate limit exceeded
+        "503":
+          description: Compiler unavailable or server at capacity
+
+components:
+  schemas:
+    CompileRequest:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+          description: Diamond source code to compile
+          example: |
+            shuru
+
+            dekhao("Hello World");
+
+            shesh
+
+    CompileResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        output:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/DiagnosticError"
+        tokens:
+          type: array
+          items:
+            $ref: "#/components/schemas/Token"
+        ast:
+          type: object
+          nullable: true
+        symbolTable:
+          type: array
+          items:
+            $ref: "#/components/schemas/Symbol"
+        rawTac:
+          type: array
+          items:
+            $ref: "#/components/schemas/TacInstruction"
+        tac:
+          type: array
+          items:
+            $ref: "#/components/schemas/TacInstruction"
+        assembly:
+          type: string
+          nullable: true
+        parseTrace:
+          type: string
+          nullable: true
+        optimizations:
+          type: object
+          nullable: true
+          properties:
+            constantFolds:
+              type: integer
+            strengthReductions:
+              type: integer
+            commonSubexpressions:
+              type: integer
+            deadCodeEliminated:
+              type: integer
+            unreachableRemoved:
+              type: integer
+        meta:
+          type: object
+          properties:
+            errorCount:
+              type: integer
+            tokenCount:
+              type: integer
+            symbolCount:
+              type: integer
+            rawTacCount:
+              type: integer
+            tacCount:
+              type: integer
+            preprocessImports:
+              type: integer
+            preprocessRecordTypes:
+              type: integer
+            preprocessRecordVariables:
+              type: integer
+            mode:
+              type: string
+              enum: [server, wasm, demo]
+            engineStatus:
+              type: string
+
+    DiagnosticError:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [preprocess, lexical, syntax, semantic, io, request, internal, compiler, rate_limit]
+        line:
+          type: integer
+          nullable: true
+        message:
+          type: string
+
+    Token:
+      type: object
+      properties:
+        type:
+          type: string
+        lexeme:
+          type: string
+        line:
+          type: integer
+
+    Symbol:
+      type: object
+      properties:
+        name:
+          type: string
+        kind:
+          type: string
+          enum: [variable, function, parameter, array]
+        type:
+          type: string
+        scope:
+          type: integer
+        line:
+          type: integer
+        arraySize:
+          type: integer
+        active:
+          type: boolean
+        builtin:
+          type: boolean
+        paramCount:
+          type: integer
+        paramTypes:
+          type: array
+          items:
+            type: string
+        memoryAddress:
+          type: integer
+
+    TacInstruction:
+      type: object
+      properties:
+        index:
+          type: integer
+        op:
+          type: string
+        arg1:
+          type: string
+          nullable: true
+        arg2:
+          type: string
+          nullable: true
+        result:
+          type: string
+          nullable: true
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        service:
+          type: string
+        environment:
+          type: string
+        compiler:
+          type: object
+          properties:
+            available:
+              type: boolean
+        limits:
+          type: object
