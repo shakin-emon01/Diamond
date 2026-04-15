@@ -1,6 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const fullMatrix = process.env.PLAYWRIGHT_FULL_MATRIX === "true";
+const webServerCommand =
+  process.platform === "win32"
+    ? "npm run build && npm run start -- --hostname 127.0.0.1 --port 3006"
+    : "npm run build && npm run start:standalone -- --hostname 127.0.0.1 --port 3006";
 
 export default defineConfig({
   testDir: "./tests",
@@ -12,7 +16,7 @@ export default defineConfig({
     trace: "on-first-retry"
   },
   webServer: {
-    command: "npm run build && npm run start -- --hostname 127.0.0.1 --port 3006",
+    command: webServerCommand,
     port: 3006,
     reuseExistingServer: true,
     timeout: 180000
