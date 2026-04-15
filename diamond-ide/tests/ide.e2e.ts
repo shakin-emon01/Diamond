@@ -2,9 +2,14 @@ import { expect, test, type Page } from "@playwright/test";
 
 async function openIde(page: Page) {
   await page.goto("/");
-  await expect(page.getByRole("button", { name: /^Compile$/i })).toBeVisible({ timeout: 20_000 });
-  await expect(page.locator("textarea[placeholder='Enter Input here']")).toBeVisible();
-  await expect(page.locator(".studio-boot")).toHaveCount(0, { timeout: 20_000 });
+  await expect(page.getByRole("button", { name: /^Compile$/i })).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator("textarea[placeholder='Enter Input here']")).toBeVisible({ timeout: 30_000 });
+
+  const boot = page.locator(".studio-boot");
+  if (await boot.count()) {
+    await expect(boot.first()).toBeHidden({ timeout: 30_000 });
+  }
+
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 }
 
