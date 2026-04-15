@@ -132,8 +132,8 @@ jobs:
           file: ./diamond-compiler/backend/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/diamond-backend:latest
-            ghcr.io/${{ github.repository }}/diamond-backend:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/diamond/diamond-backend:latest
+            ghcr.io/${{ github.repository_owner }}/diamond/diamond-backend:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -144,7 +144,7 @@ jobs:
           file: ./diamond-ide/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/diamond-ide:latest
-            ghcr.io/${{ github.repository }}/diamond-ide:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/diamond/diamond-ide:latest
+            ghcr.io/${{ github.repository_owner }}/diamond/diamond-ide:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
