@@ -51,6 +51,6 @@ USER diamond
 
 # Health check for orchestrators
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD node -e "fetch('http://localhost:4000/api/v1/health/live').then(r=>{if(!r.ok)throw r})" || exit 1
+  CMD node -e "const port = process.env.PORT || 4000; fetch('http://localhost:' + port + '/api/v1/health/live').then(r=>{if(!r.ok)throw r})" || exit 1
 
 CMD ["node", "src/server.js"]
