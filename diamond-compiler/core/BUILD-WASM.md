@@ -1,36 +1,34 @@
-## Building the Diamond compiler to WebAssembly
+# Building Diamond To WebAssembly
 
-The WebAssembly bundle is consumed by the production IDE in `diamond-ide`. The preferred flow is:
+This guide explains how to build the compiler core into WebAssembly and make it available to the `diamond-ide` frontend.
 
-1. Build the compiler bundle from `diamond-compiler/core`
-2. Let the scripts copy the generated files into each frontend automatically
+## Purpose
 
-Current frontend targets:
+The generated bundle lets the browser compile Diamond code without requiring a server for the normal classroom workflow.
 
-```text
-diamond-ide/public/wasm/diamond.js
-diamond-ide/public/wasm/diamond.wasm
-diamond-ide/public/workers/diamond-wasm-worker.js
-```
+Expected generated assets:
 
-If the bundle is missing, the frontends fall back to demo analysis mode.
+- `diamond-compiler/core/diamond.js`
+- `diamond-compiler/core/diamond.wasm`
+- `diamond-ide/public/wasm/diamond.js`
+- `diamond-ide/public/wasm/diamond.wasm`
+- `diamond-ide/public/workers/diamond-wasm-worker.js`
 
-## 1. Install prerequisites
+## Prerequisites
 
-You need:
+- Emscripten SDK with `emcc`
+- Flex and Bison, or WinFlexBison on Windows
+- Node.js for asset sync scripts
 
-- **Emscripten SDK** with `emcc`
-- **Flex / Bison** or **winflexbison**
-
-Official Emscripten install guide:
-
-https://emscripten.org/docs/getting_started/downloads.html
-
-After activation, `emcc` should be available in your shell.
-
-## 2. One-command Windows build
+## Preferred Windows Build
 
 From `diamond-compiler/`:
+
+```powershell
+.\build-wasm.ps1
+```
+
+If your toolchain is not on `PATH`, provide explicit locations:
 
 ```powershell
 .\build-wasm.ps1 `
@@ -38,41 +36,35 @@ From `diamond-compiler/`:
   -WinFlexBisonDir "C:\path\to\winflexbison"
 ```
 
-If your tools are already on `PATH`, you can simply run:
+## What The Script Does
 
-```powershell
-.\build-wasm.ps1
-```
+1. regenerates `parser.tab.c` and `parser.tab.h` from `parser.y`
+2. regenerates `lex.yy.c` from `lexer.l`
+3. compiles the compiler with `emcc`
+4. copies the generated WASM assets into `diamond-ide/public/wasm/`
+5. copies the browser worker into `diamond-ide/public/workers/`
 
-What the script does:
+Use `-SkipCopy` if you only want the build artifacts inside `diamond-compiler/core/`.
 
-1. Regenerates `parser.tab.c/.h` from `parser.y`
-2. Regenerates `lex.yy.c` from `lexer.l`
-3. Compiles the compiler core with `emcc`
-4. Copies `diamond.js` and `diamond.wasm` into the active frontend `public/wasm/` target
-5. Copies `diamond-wasm-worker.js` into `diamond-ide/public/workers/`
+## Sync An Existing Build Into The IDE
 
-Use `-SkipCopy` if you only want the artifacts in `diamond-compiler/core/`.
-
-## 3. Sync an existing compiler build into `diamond-ide`
-
-If `diamond-compiler/core/diamond.js` and `diamond-compiler/core/diamond.wasm` already exist:
+If `diamond.js` and `diamond.wasm` already exist under `diamond-compiler/core/`, run:
 
 ```powershell
 cd ..\diamond-ide
 npm run sync:wasm
 ```
 
-This copies the WASM bundle into `diamond-ide/public/wasm/`, installs the worker into `diamond-ide/public/workers/`, and removes stale duplicate root-level files from `diamond-ide/public/`.
+This refreshes the frontend assets and removes stale root-level copies from `diamond-ide/public/`.
 
-## 4. Manual build
+## Manual Build
 
 From `diamond-compiler/core/`:
 
 ```bash
 bison -d parser.y
 flex lexer.l
-emcc lex.yy.c parser.tab.c ast.c symtab.c tac.c driver.c \
+emcc lex.yy.c parser.tab.c ast.c preprocess.c symtab.c tac.c driver.c \
   -O2 -DDIAMOND_WASM \
   -s EXPORTED_FUNCTIONS='["_diamond_compile","_diamond_free"]' \
   -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap","UTF8ToString"]' \
@@ -83,24 +75,22 @@ emcc lex.yy.c parser.tab.c ast.c symtab.c tac.c driver.c \
   -o diamond.js
 ```
 
-After a manual build, either copy the files into the frontend targets yourself or run:
+After a manual build, sync the files into the IDE:
 
 ```powershell
 cd ..\..\diamond-ide
 npm run sync:wasm
 ```
 
-## 5. Verifying the WASM path
+## Verification
 
-After building the bundle:
+1. start the IDE with `npm run dev` inside `diamond-ide`
+2. open the browser IDE
+3. compile a template program
+4. confirm the IDE reports real compiler output instead of demo fallback behavior
 
-1. Start the IDE:
+## Notes
 
-```powershell
-cd ..\..\diamond-ide
-npm run dev
-```
-
-2. Open the browser workspace.
-3. Compile any template.
-4. Confirm the UI reports that the WASM compiler is active instead of demo mode.
+- the IDE prefers a Web Worker WASM compiler first, then main-thread WASM
+- if both WASM paths fail, the frontend can fall back to the backend API and then demo mode
+- files inside `diamond-ide/public/wasm/` are generated assets and should not be edited manually

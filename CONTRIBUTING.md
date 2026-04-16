@@ -1,139 +1,108 @@
-# Contributing to Diamond Compiler
+# Contributing To Diamond
 
-Thank you for your interest in contributing! This document explains how to set up the project, follow coding conventions, and submit changes.
+This guide is written for students, teammates, and reviewers who want to improve the project without losing consistency across the compiler, IDE, and documentation.
 
----
+## Before You Start
 
-## Development Environment
+- read the main [README.md](./README.md) for the project overview
+- check the [language specification](./diamond-compiler/docs/language-spec.md) before changing grammar-related behavior
+- check the [compiler architecture note](./diamond-compiler/docs/compiler-architecture.md) before changing pipeline behavior
 
-### Prerequisites
+## Recommended Prerequisites
 
-| Tool | Required For | Install |
-|---|---|---|
-| **Node.js** (>= 18) | Web IDE & Backend | [nodejs.org](https://nodejs.org) |
-| **Flex / WinFlexBison** | Lexer generation | [winflexbison](https://github.com/lexxmark/winflexbison) |
-| **Bison / WinFlexBison** | Parser generation | (bundled with WinFlexBison) |
-| **GCC / MinGW** | Native compiler build | [mingw-w64.org](https://www.mingw-w64.org) |
+| Tool | Why it is needed |
+|---|---|
+| Node.js 20 or later | IDE, scripts, tests, backend |
+| Flex / WinFlexBison | lexer generation |
+| Bison / WinFlexBison | parser generation |
+| GCC / MinGW | native compiler build |
+| Emscripten | WebAssembly build |
 
-### Setup
+## Local Setup
 
-```bash
-# Clone the repository
-git clone <repository-url>
-cd "Compiler Project"
+### IDE
 
-# Install IDE dependencies
+```powershell
 cd diamond-ide
 npm install
-
-# Sync WASM assets (if compiler is pre-built)
-npm run sync:wasm
-
-# Start the IDE
 npm run dev
+```
 
-# Start a production-like IDE server after building
-npm run build
-npm run start -- --hostname 127.0.0.1 --port 3000
+### Backend
 
-# (Optional) Install and start the backend
-cd ../diamond-compiler/backend
+```powershell
+cd diamond-compiler\backend
 npm install
 npm run dev
-npm start
 ```
 
----
+### Native compiler
 
-## Project Structure
-
-- `diamond-compiler/core/` — C source for the compiler (Flex, Bison, AST, symbol table, TAC)
-- `diamond-compiler/backend/` — Express.js API server
-- `diamond-ide/` — Next.js web IDE (primary frontend)
-- `.github/workflows/` — CI pipeline
-
----
-
-## Coding Standards
-
-### C Code (Compiler Core)
-
-- Follow the `.clang-format` configuration in `diamond-compiler/`
-- Use C99-compatible syntax (no C++ features)
-- All functions and types use `snake_case`
-- Header guards use `DIAMOND_` prefix
-- Memory: every `malloc`/`calloc` must have a corresponding `free` path
-
-### TypeScript / JavaScript (IDE & Backend)
-
-- Use TypeScript strict mode for all IDE code
-- Backend uses CommonJS (`require`); IDE uses ES modules (`import`)
-- No `any` types without explicit justification
-- Use `eslint` with the project's existing config: `npm run lint`
-- Prefer named exports over default exports
-
-### Commit Messages
-
-Use conventional commit format:
-
-```
-type(scope): short description
-
-Optional longer description.
+```powershell
+cd "d:\Projects\Compiler Project"
+npm run build:native
 ```
 
-Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `ci`
+## Common Commands
 
-Examples:
-- `feat(compiler): add modulo operator support`
-- `fix(ide): prevent crash on empty AST`
-- `docs(readme): update build instructions`
-
----
-
-## Running Tests
-
-```bash
-# All tests (native + IDE unit + backend)
+```powershell
+# workspace-level checks
 npm test
 
-# IDE unit tests only
-npm --prefix diamond-ide run test:unit
-
-# IDE E2E browser tests
-npm --prefix diamond-ide run test:e2e
-
-# Backend API tests
-npm --prefix diamond-compiler/backend run test
-
-# Native compiler regression
+# native regression suite
 npm run test:native
 
-# Lint
+# IDE checks
 npm --prefix diamond-ide run lint
+npm --prefix diamond-ide run test:unit
+npm --prefix diamond-ide run test:e2e
+
+# backend checks
+npm --prefix diamond-compiler/backend run test
 ```
 
----
+## Contribution Rules
 
-## Pull Request Process
+### Compiler changes
 
-1. **Fork** the repository and create a feature branch from `main`
-2. **Write tests** for any new functionality
-3. **Run the full test suite** locally before pushing
-4. **Open a PR** with a clear title and description
-5. PRs require passing CI checks before merging
-6. Keep PRs focused — one feature or fix per PR
+- keep the language behavior consistent with `diamond-compiler/docs/language-spec.md`
+- update documentation when keywords, grammar, diagnostics, or code generation behavior changes
+- preserve educational clarity; the project should remain easy to explain in a lab defense
 
----
+### IDE changes
 
-## Reporting Issues
+- keep the student workflow simple: edit, compile, inspect, run, debug
+- if a new analysis panel is added, document it in the README and report
+- prefer interfaces that help teachers demonstrate compiler stages clearly
 
-- Use GitHub Issues for bug reports and feature requests
-- Include reproduction steps, expected vs. actual behavior, and relevant logs
-- For compiler bugs, include the `.diu` source code that triggers the issue
+### Documentation changes
 
----
+- keep explanations understandable for students and teachers
+- remove outdated claims instead of leaving conflicting notes in place
+- if a file is generated, note that clearly in the document
+
+## Pull Request Expectations
+
+- keep pull requests focused on one main improvement
+- run relevant tests before submitting
+- describe what changed, why it changed, and how it was verified
+- include screenshots for visible IDE changes when helpful
+
+## Suggested Commit Types
+
+- `feat`: new functionality
+- `fix`: bug fix
+- `docs`: documentation update
+- `refactor`: structure improvement without feature change
+- `test`: new or updated tests
+- `ci`: workflow or automation update
+
+## Final Check Before Merge
+
+- code or docs match the current implementation
+- no stale screenshots, links, or team information remain
+- the README, report, and technical docs still agree with each other
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+By contributing, you agree that contributions remain under the [MIT License](./LICENSE).

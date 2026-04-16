@@ -1,99 +1,285 @@
-## Diamond Language Specification (Draft)
+# Diamond Language Specification
 
-### 1. Overview
+## 1. Purpose
 
-Diamond is a beginner-friendly, Bengali-flavoured educational programming language.
-It is designed to teach core programming and compiler concepts using a clean,
-consistent syntax that is easy to parse with Flex and Bison.
+Diamond is a beginner-friendly educational programming language built for compiler design learning. It uses Bengali-inspired keywords while keeping the structure familiar to students who have seen C-style syntax.
 
-Source files use the extension: `.diu`.
+Source files use the extension `.diu`.
 
-### 2. Design Goals
+## 2. Design Goals
 
-- Simple, readable syntax.
-- Bengali-inspired keywords with English-style operators.
-- Clear mapping from syntax to tokens, AST, symbol table entries, and TAC.
-- Support for:
-  - Variables and basic types.
-  - Arithmetic and boolean expressions.
-  - Conditionals and loops.
-  - Functions.
-  - Arrays and strings (basic operations).
+- keep syntax easy to read and easy to parse
+- connect language features directly to compiler concepts
+- support classroom examples for declarations, conditions, loops, functions, arrays, and input/output
+- expose compiler artifacts such as tokens, AST, symbol tables, and TAC in a teachable way
 
-### 3. Lexical Structure
+## 3. Keywords
 
-#### 3.1. Keywords
+### Program structure
 
-The following reserved keywords cannot be used as identifiers:
+- `shuru` : program start
+- `shesh` : program end
 
-`shuru`, `shesh`,
-`dhoro`,
-`shonkha`, `doshomik`, `lekha`, `shotto`, `khali`, `auto`, `mithya`,
-`jodi`, `naile`,
-`jotokhon`, `ghurao`,
-`kaj`, `ferot`,
-`dekhao`, `nao`,
-`ebong`, `ba`, `na`,
-`amdani`, `gothon`.
+### Declarations and types
 
-#### 3.2. Identifiers
+- `dhoro` : declare a variable
+- `shonkha` : integer
+- `doshomik` : floating-point number
+- `lekha` : string
+- `shotto` : boolean type
+- `mithya` : boolean false literal
+- `khali` : function-only void-like return type
+- `auto` : inferred type from initializer
 
-Pattern: `[A-Za-z_][A-Za-z0-9_]*`
+### Control flow
 
-Examples: `a`, `total_sum`, `result1`.
+- `jodi` : if
+- `naile` : else
+- `jotokhon` : while loop
+- `ghurao` : for loop
 
-#### 3.3. Literals
+### Functions and I/O
 
-- Integer: `[0-9]+` (e.g., `0`, `42`).
-- Float: `[0-9]+\.[0-9]+` (e.g., `3.14`).
-- String: double-quoted text without newlines, e.g. `"Hello World"`.
-- Boolean: `shotto` (true), `mithya` (false).
+- `kaj` : function declaration
+- `ferot` : return
+- `dekhao` : print output
+- `nao` : read input
 
-#### 3.4. Operators and Delimiters
+### Logic and preprocessing
 
-- Arithmetic: `+`, `-`, `*`, `/`
-- Assignment: `=`
-- Comparison: `<`, `>`, `<=`, `>=`, `==`, `!=`
-- Logical: `ebong` (and), `ba` (or), `na` (not)
-- Delimiters: `(`, `)`, `{`, `}`, `[`, `]`, `;`, `,`
+- `ebong` : logical and
+- `ba` : logical or
+- `na` : logical not
+- `amdani` : import another `.diu` file
+- `gothon` : record-style declaration handled by preprocessing
 
-#### 3.5. Comments
+## 4. Data Types
 
-- Single-line: `// ...` until end of line.
-- Multi-line: `/* ... */`.
+| Type | Meaning | Example |
+|---|---|---|
+| `shonkha` | integer | `5`, `-2` |
+| `doshomik` | floating-point number | `3.14`, `7.5` |
+| `lekha` | string | `"Diamond"` |
+| `shotto` | boolean | `shotto`, `mithya` |
+| `khali` | function return only | `kaj khali show() { ferot; }` |
 
-#### 3.6. Token Stream Support
+### Type behavior
 
-The compiler front-end may expose the lexer output as a token stream for
-teaching and debugging purposes.
+- exact type matches are accepted
+- `shonkha` can be promoted to `doshomik`
+- string, boolean, and numeric values do not convert implicitly between each other
+- `auto` requires an initializer with a concrete type
+- `khali` values cannot be used inside normal expressions
 
-Example:
+## 5. Program Structure
+
+A normal Diamond program starts with `shuru` and ends with `shesh`.
+
+```text
+shuru
+
+dekhao("Hello Diamond");
+
+shesh
+```
+
+Functions appear before the main program block.
+
+## 6. Declarations
+
+### Variables
 
 ```text
 dhoro shonkha a;
+dhoro doshomik price;
+dhoro lekha name;
+dhoro shotto ready;
 ```
 
-Possible token output:
+### Arrays
 
 ```text
-DHORO SHONKHA ID(a) SEMICOLON
+dhoro shonkha marks[5];
+marks[0] = 90;
 ```
 
-### 4. Types
+### Type inference with `auto`
 
-Diamond has the following built-in types:
+```text
+dhoro auto total = 5 + 7;
+```
 
-- `shonkha` — integer (whole numbers).
-- `doshomik` — floating-point numbers.
-- `lekha` — strings (text).
-- `shotto` — boolean values (`shotto` or `mithya`).
-- `khali` — function-only return type for procedures that do not return a value.
+`auto` is useful for short examples, but explicit types remain better for teaching and readability.
 
-Diamond also supports user-defined record-style composite types through
-`gothon`. These are currently lowered during preprocessing into flattened
-native declarations.
+## 7. Expressions And Operators
 
-Example:
+### Arithmetic
+
+- `+`
+- `-`
+- `*`
+- `/`
+
+### Comparison
+
+- `<`
+- `>`
+- `<=`
+- `>=`
+- `==`
+- `!=`
+
+### Logical
+
+- `ebong`
+- `ba`
+- `na`
+
+### Simplified precedence
+
+1. parentheses
+2. unary minus and `na`
+3. `*` and `/`
+4. `+` and `-`
+5. comparison operators
+6. `ebong`, `ba`
+
+## 8. Assignment
+
+```text
+a = 10;
+name = "Rahim";
+ready = shotto;
+marks[2] = 75;
+```
+
+Assignments must respect type compatibility rules.
+
+## 9. Input And Output
+
+### Output
+
+```text
+dekhao("Hello");
+dekhao(a);
+```
+
+### Input
+
+```text
+nao(a);
+nao(name);
+```
+
+The IDE provides a separate input area for programs that use `nao()`.
+
+## 10. Conditional Statements
+
+```text
+jodi (a > 10) {
+    dekhao("Large");
+}
+```
+
+```text
+jodi (a > 10) {
+    dekhao("Large");
+} naile {
+    dekhao("Small");
+}
+```
+
+Conditions are expected to evaluate to `shotto`.
+
+## 11. Loops
+
+### While loop
+
+```text
+jotokhon (a < 5) {
+    dekhao(a);
+    a = a + 1;
+}
+```
+
+### For loop
+
+```text
+ghurao (i = 0; i < 5; i = i + 1) {
+    dekhao(i);
+}
+```
+
+## 12. Functions
+
+### Basic function
+
+```text
+kaj jog(a, b) {
+    ferot a + b;
+}
+```
+
+### Typed function
+
+```text
+kaj shonkha jog(shonkha a, shonkha b) {
+    ferot a + b;
+}
+```
+
+### Void-like function
+
+```text
+kaj khali shagotom(lekha name) {
+    dekhao(name);
+    ferot;
+}
+```
+
+### Function rules
+
+- functions are declared before the main block
+- if a return type is omitted, legacy behavior defaults to `shonkha`
+- untyped parameters remain supported for backward compatibility and default to `shonkha`
+- `ferot` is only valid inside function bodies
+- `khali` functions may use `ferot;` but cannot return a value
+- function calls are checked for argument count and type compatibility
+
+## 13. Built-In Helper Functions
+
+Diamond predeclares a small helper library.
+
+| Function | Return type | Purpose |
+|---|---|---|
+| `jora(lekha, lekha)` | `lekha` | join two strings |
+| `dairgho(lekha)` | `shonkha` | string length |
+| `ongsho(lekha, shonkha, shonkha)` | `lekha` | substring |
+| `tulona(lekha, lekha)` | `shonkha` | string comparison |
+| `boro(doshomik, doshomik)` | `doshomik` | maximum |
+| `chhoto(doshomik, doshomik)` | `doshomik` | minimum |
+| `porom(doshomik)` | `doshomik` | absolute value |
+| `ulto(lekha)` | `lekha` | reverse string |
+| `vagshesh(shonkha, shonkha)` | `shonkha` | remainder |
+| `gol(doshomik)` | `shonkha` | round |
+| `shonkhakor(lekha)` | `shonkha` | convert string to integer |
+| `lekhakor(doshomik)` | `lekha` | convert number to string |
+
+## 14. Imports And Records
+
+### Imports
+
+Diamond supports preprocessing-based imports:
+
+```text
+amdani "modules/math-utils.diu";
+```
+
+Imported files are expanded before normal lexing and parsing.
+
+### Record-style declarations
+
+Diamond also supports `gothon` declarations that are lowered by preprocessing:
 
 ```text
 gothon Person {
@@ -102,401 +288,50 @@ gothon Person {
 }
 ```
 
-#### 4.1. Type compatibility and conversions
+The current implementation treats this as a preprocessing feature rather than a full runtime record system.
 
-The compiler currently accepts:
+Current limitation:
 
-- exact type matches
-- implicit promotion from `shonkha` to `doshomik`
+- record-typed values cannot yet be passed directly as function parameters or returns
 
-The compiler currently rejects:
+## 15. Comments
 
-- implicit numeric-to-string conversion
-- implicit string-to-numeric conversion
-- implicit boolean-to-numeric conversion
-- implicit use of `khali` values inside expressions
+- single-line comments: `// comment`
+- multi-line comments: `/* comment */`
 
-Explicit conversion helpers are exposed through built-in library functions:
-
-- `shonkhakor(lekha) -> shonkha`
-- `lekhakor(doshomik) -> lekha`
-
-These rules are enforced in declarations, assignments, function arguments,
-return statements, and equality checks.
-
-### 5. Program Structure
-
-Every program:
-
-- May import other `.diu` source files using `amdani "relative/path.diu";`.
-- May start with a virtual include line (for documentation only):
-  `#include <daffodil.h>` (treated as a comment by the compiler front-end).
-- Must start with `shuru` and end with `shesh`.
-
-Example:
-
-```text
-shuru
-
-dekhao("Hello World");
-
-shesh
-```
-
-### 6. Declarations and Variables
-
-Variables are declared using `dhoro` followed by a type and identifier.
-Diamond also supports `auto` for declaration-time type inference when an
-initializer is present.
-
-Syntax:
-
-```text
-dhoro <type> <id>;
-dhoro <type> <id>[<size>];    // array
-dhoro auto <id> = <expression>;
-dhoro <RecordType> <id>;      // lowered by the preprocessor
-```
-
-Examples:
-
-```text
-dhoro shonkha a;
-dhoro doshomik price;
-dhoro lekha name;
-dhoro shonkha arr[10];
-dhoro auto total = 5 + 7;
-dhoro Person user;
-```
-
-Record fields are accessed with dot syntax and lowered before parsing:
-
-```text
-user.name = "Rahim";
-dekhao(user.name);
-```
-
-#### 6.1. Scope rules
-
-Diamond uses lexical scoping.
-
-- The main program body (`shuru ... shesh`) behaves as the top-level executable scope.
-- Each `{ ... }` block introduces a nested scope.
-- Function parameters belong to the function scope.
-- Redeclaration in the same scope is rejected.
-- Shadowing from an outer scope into an inner scope is allowed.
-- Symbols become inactive after leaving a scope, but remain visible in exported analysis views.
-
-### 7. Assignment
-
-Assignment uses `=` with compatible types.
-
-Examples:
-
-```text
-a = 10;
-name = "Rahim";
-flag = shotto;
-arr[0] = 5;
-```
-
-### 8. Expressions
-
-Expressions support arithmetic, comparison, logical operations, and string
-concatenation.
-
-Operator precedence (from high to low):
-
-1. Parentheses: `( expr )`
-2. Unary minus: `-expr`, logical not: `na expr`
-3. Multiplication and division: `*`, `/`
-4. Addition and subtraction: `+`, `-`
-5. Comparisons: `<`, `>`, `<=`, `>=`, `==`, `!=`
-6. Logical and/or: `ebong`, `ba`
-
-Examples:
-
-```text
-a = 5 + 3 * 2;
-jodi (a > 5 ebong a < 20) { ... }
-name = "Diamond " + "Compiler";
-```
-
-### 9. Input / Output
-
-#### 9.1. Output
-
-Keyword: `dekhao`
-
-```text
-dekhao(a);
-dekhao("Hello");
-```
-
-#### 9.2. Input
-
-Keyword: `nao`
-
-```text
-nao(a);
-```
-
-### 10. Conditionals
-
-#### 10.1. If
-
-```text
-jodi (condition) {
-    // statements
-}
-```
-
-#### 10.2. If–Else
-
-```text
-jodi (condition) {
-    // statements
-}
-naile {
-    // statements
-}
-```
-
-### 11. Loops
-
-#### 11.1. While loop — `jotokhon`
-
-```text
-jotokhon (condition) {
-    // statements
-}
-```
-
-#### 11.2. For loop — `ghurao`
-
-```text
-ghurao (init; condition; step) {
-    // statements
-}
-```
-
-Example:
-
-```text
-ghurao (i = 0; i < 5; i = i + 1) {
-    dekhao(i);
-}
-```
-
-### 12. Functions
-
-Function declaration uses `kaj` and return with `ferot`. Functions may declare
-an explicit return type. If omitted, the compiler keeps the legacy default of
-`shonkha`.
-
-Basic idea:
+## 16. Example Program
 
 ```text
 kaj shonkha jog(shonkha a, shonkha b) {
     ferot a + b;
 }
 
-kaj khali shagotom(lekha name) {
-    dekhao("Hello " + name);
-    ferot;
-}
-
 shuru
 
 dhoro shonkha result;
+dhoro lekha title;
+
 result = jog(5, 3);
+title = "Diamond Result";
+
+dekhao(title);
 dekhao(result);
 
 shesh
 ```
 
-Untyped parameters remain valid for backwards compatibility and default to
-`shonkha`, but typed parameters are recommended for new code.
+## 17. Observable Compiler Outputs
 
-#### 12.2. Function and return semantics
+The current project can expose the following learning artifacts:
 
-- Functions must be declared before the `shuru ... shesh` main block.
-- If the return type is omitted, the current default is `shonkha`.
-- If a parameter type is omitted, the current default is `shonkha`.
-- `ferot` can only appear inside a function body.
-- `khali` functions may use `ferot;` but may not return an expression.
-- Non-`khali` functions must return a value compatible with the declared type.
-- Function calls are checked for both argument count and argument type compatibility.
-- Record-typed function parameters are not supported yet by the preprocessing/lowering stage.
+- token stream
+- AST
+- symbol table
+- scope information
+- diagnostics
+- raw TAC
+- optimized TAC
+- educational pseudo-assembly
+- preprocessing statistics
 
-### 12.1. Built-in Library
-
-The compiler predeclares a small standard library of string and math helpers:
-
-- `jora(lekha, lekha) -> lekha`
-- `dairgho(lekha) -> shonkha`
-- `ongsho(lekha, shonkha, shonkha) -> lekha`
-- `tulona(lekha, lekha) -> shonkha`
-- `boro(doshomik, doshomik) -> doshomik`
-- `chhoto(doshomik, doshomik) -> doshomik`
-- `porom(doshomik) -> doshomik`
-- `ulto(lekha) -> lekha`
-- `vagshesh(shonkha, shonkha) -> shonkha`
-- `gol(doshomik) -> shonkha`
-- `shonkhakor(lekha) -> shonkha`
-- `lekhakor(doshomik) -> lekha`
-
-### 13. Compiler Outputs
-
-The current Diamond compiler project may expose the following intermediate
-artifacts in the web IDE or CLI JSON output:
-
-- Token stream
-- AST (Abstract Syntax Tree)
-- Symbol table
-- Diagnostics with line number and error type
-- Raw TAC (Three Address Code)
-- Optimized TAC
-- Educational pseudo-assembly listing
-- Optional Bison parse trace when trace mode is enabled
-- Optimization counters for constant folding, strength reduction, common subexpression elimination, dead code elimination, and unreachable code removal
-
-These outputs are intended to make the compiler front-end observable during lab
-presentation and viva.
-
-#### 13.1. Diagnostic classes
-
-The implementation distinguishes the following compile-time diagnostic families:
-
-- `preprocess`
-- `lexical`
-- `syntax`
-- `semantic`
-- `io`
-- `request`
-- `internal`
-
-The IDE may additionally surface runtime errors separately while interpreting the
-AST for classroom demonstrations.
-
-#### 13.2. Code generation target
-
-Diamond currently emits an educational pseudo-assembly listing after the TAC
-optimization stage. This is separate from the WebAssembly build of the compiler
-itself, which is used to run the front-end inside the browser.
-
-### 14. Sample Program
-
-```text
-shuru
-
-dhoro shonkha a;
-dhoro shonkha b;
-
-a = 5;
-b = 10;
-
-jodi (a < b) {
-    dekhao("a is smaller");
-}
-
-ghurao (i = 0; i < 5; i = i + 1) {
-    dekhao(i);
-}
-
-shesh
-```
-
-### 15. High-level Grammar Sketch
-
-This is a simplified context-free grammar outline (details will be finalized
-in the Bison file):
-
-```text
-program       → functions_opt SHURU statements SHESH
-
-functions_opt → functions
-              | ε
-
-functions     → functions function_decl
-              | function_decl
-
-function_decl → KAJ return_type_opt ID '(' params_opt ')' block
-params_opt    → params
-              | ε
-params        → params ',' param
-              | param
-param         → type ID
-              | ID
-
-statements    → statements statement
-              | statement
-
-statement     → declaration
-              | assignment
-              | if_stmt
-              | while_loop
-              | for_loop
-              | func_call ';'
-              | print_stmt
-              | input_stmt
-              | return_stmt
-              | block
-
-declaration   → DHORO type ID ';'
-              | DHORO type ID '=' expression ';'
-              | DHORO type ID '[' NUMBER ']' ';'
-              | DHORO AUTO ID '=' expression ';'
-
-type          → SHONKHA
-              | DOSHOMIK
-              | LEKHA
-              | SHOTTO
-
-return_type   → type
-              | KHALI
-
-return_type_opt → return_type
-                | ε
-
-assignment    → ID '=' expression ';'
-              | ID '[' expression ']' '=' expression ';'
-
-print_stmt    → DEKHAO '(' expression ')' ';'
-input_stmt    → NAO '(' ID ')' ';'
-return_stmt   → FEROT expression ';'
-              | FEROT ';'
-
-if_stmt       → JODI '(' condition ')' block
-              | JODI '(' condition ')' block NAILE block
-
-while_loop    → JOTOKHON '(' condition ')' block
-
-for_loop      → GHURAO '(' init ';' condition ';' step ')' block
-
-block         → '{' statements '}'
-
-condition     → expression relop expression
-              | expression
-
-relop         → '<' | '>' | LE | GE | EQ | NE
-
-expression    → expression PLUS term
-              | expression MINUS term
-              | term
-
-term          → term MUL factor
-              | term DIV factor
-              | factor
-
-factor        → NUMBER
-              | STRING
-              | ID
-              | ID '[' expression ']'
-              | func_call
-              | '(' expression ')'
-```
-
-This document will guide the Flex and Bison implementations and will be
-extended as we add arrays, strings, functions, and semantic analysis.
-
+These outputs are available through the compiler JSON result and are visualized in the web IDE.
