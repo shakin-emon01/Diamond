@@ -1,20 +1,27 @@
-The files under `public/wasm/` and `public/workers/` are managed automatically.
+# Public Asset Notes
 
-Use one of these commands instead of copying files into `public/` by hand:
+The files under `diamond-ide/public/` include generated compiler delivery assets. The most important generated locations are:
+
+- `public/wasm/`
+- `public/workers/`
+
+## Do Not Update These Assets By Hand
+
+Use the project scripts instead:
 
 ```powershell
-# Build the compiler and copy the browser assets into every frontend target
+# Build the compiler and copy assets into the IDE
 cd diamond-compiler
 .\build-wasm.ps1
 
-# Or, if the compiler bundle already exists under diamond-compiler/core/
+# Or, if the compiler bundle already exists
 npm --prefix diamond-ide run sync:wasm
 ```
 
-Expected generated assets:
+## Expected Generated Files
 
 - `public/wasm/diamond.js`
 - `public/wasm/diamond.wasm`
 - `public/workers/diamond-wasm-worker.js`
 
-Root-level duplicates such as `public/diamond.js` and `public/diamond.wasm` are intentionally removed by the sync step.
+Any stale root-level copies such as `public/diamond.js` or `public/diamond.wasm` are intentionally removed during sync.

@@ -1,246 +1,178 @@
 # Diamond Compiler Architecture
 
-## 1. Purpose
+## 1. Goal
 
-This document maps the Diamond implementation to the compiler-course concepts
-teachers usually expect to see during evaluation: pipeline separation, semantic
-rules, diagnostics, intermediate representation, optimization, code generation,
-and execution/runtime visualization.
+This document explains how the current Diamond implementation maps to standard compiler-course topics and to the major folders in the repository.
 
-## 2. End-to-End Pipeline
+## 2. End-To-End Pipeline
 
 ```text
 Diamond source (.diu)
         |
         v
-Preprocessor
-  - amdani expansion
-  - gothon lowering
+Preprocessing
+  - amdani import expansion
+  - gothon record lowering
         |
         v
-Lexer
-  - token stream
+Lexical analysis
+  - token generation
   - lexical diagnostics
         |
         v
-Parser
-  - AST construction
-  - syntax diagnostics
+Parsing and AST construction
+  - syntax validation
+  - AST output
         |
         v
-Semantic Analysis
-  - symbol table
+Semantic analysis
   - scope checks
   - type checks
-  - function/return validation
+  - function and array validation
         |
         v
-Raw TAC Generation
+Raw TAC generation
         |
         v
-Optimization Passes
-  - constant folding
-  - strength reduction
-  - common subexpression elimination
-  - dead code elimination
-  - unreachable code removal
+Optimization summary
         |
         v
-Pseudo-Assembly + JSON export
+Pseudo-assembly and JSON export
 ```
 
-## 3. Module Ownership
+## 3. Main Source Ownership
 
-| Phase | Files | Responsibility |
+| Area | Important files | Purpose |
 |---|---|---|
-| Preprocessing | `core/preprocess.c`, `core/preprocess.h` | Expands imports, lowers record-style `gothon` declarations into parser-friendly source, tracks preprocessing statistics |
-| Lexical analysis | `core/lexer.l` | Produces tokens with line numbers and lexical errors |
-| Parsing + AST | `core/parser.y`, `core/ast.c`, `core/ast.h` | Builds the typed AST and recovers from syntax errors where possible |
-| Semantic analysis | `core/parser.y`, `core/symtab.c`, `core/symtab.h` | Enforces scope, declaration, type, function, array, and return rules |
-| IR + optimization | `core/tac.c`, `core/tac.h` | Emits raw TAC, optimized TAC, optimization counts, and pseudo-assembly |
-| Driver/export | `core/driver.c` | Coordinates phases and serializes all artifacts into JSON for CLI, WASM, and backend consumers |
+| Preprocessing | `core/preprocess.c`, `core/preprocess.h` | expands imports and lowers record-style declarations |
+| Lexer | `core/lexer.l` | tokenizes source and reports lexical issues |
+| Parser | `core/parser.y` | grammar, AST construction, and many semantic checks |
+| AST model | `core/ast.c`, `core/ast.h` | creates and manages tree nodes |
+| Symbol table | `core/symtab.c`, `core/symtab.h` | scoped symbol tracking, built-ins, memory offsets |
+| TAC and codegen | `core/tac.c`, `core/tac.h` | raw TAC, optimized TAC, pseudo-assembly |
+| Driver | `core/driver.c` | coordinates compilation and serializes JSON output |
+| Backend | `backend/src/app.js` | server-side compilation fallback API |
+| IDE | `diamond-ide/` | browser UI, analysis panels, runtime, debugger, reporting |
 
-## 4. Language Semantics
+## 4. Current Compilation Outputs
 
-### 4.1 Scope rules
+The compiler exports a structured result that may include:
 
-- Diamond uses lexical scoping.
-- `shuru ... shesh` owns the main program block.
-- Every `{ ... }` block introduces a new nested scope.
-- Function parameters live in the function scope.
-- Redeclaration in the same scope is rejected.
-- Shadowing from an outer scope into an inner scope is allowed.
-- Symbols become inactive after leaving their scope, but remain visible in the exported symbol table for teaching/debugging.
+- success flag and summary output
+- diagnostics with line numbers and error categories
+- token stream
+- AST
+- symbol table
+- raw TAC
+- optimized TAC
+- pseudo-assembly
+- parse trace when enabled
+- optimization counters
+- preprocessing statistics
 
-### 4.2 Type rules
+## 5. Semantic Responsibilities
 
-Built-in scalar types:
+The current compiler checks several important rules:
 
-- `shonkha` -> integer
-- `doshomik` -> floating-point number
-- `lekha` -> string
-- `shotto` -> boolean
-- `khali` -> function-only "void" return type
+- undeclared identifier use
+- redeclaration in the same scope
+- assignment type mismatches
+- invalid return usage
+- function argument count and type mismatches
+- boolean requirements in conditional logic
+- array declaration and indexed access validation
+- invalid use of `khali` inside expressions
 
-Compatibility rules implemented by the compiler:
+## 6. Symbol Table And Memory Model
 
-- Exact type matches are accepted.
-- `shonkha -> doshomik` is the only implicit promotion.
-- No implicit conversion exists between numeric values and `lekha`.
-- No implicit conversion exists between numeric values and `shotto`.
-- `khali` expressions cannot participate in normal expressions.
+The symbol table stores more than names and types. It currently tracks:
 
-Explicit conversion path currently provided through built-in helpers:
-
-- `shonkhakor(lekha) -> shonkha`
-- `lekhakor(doshomik) -> lekha`
-
-### 4.3 Function semantics
-
-- Functions are declared with `kaj`.
-- Functions appear before the `shuru ... shesh` main block.
-- If a return type is omitted, the current legacy default is `shonkha`.
-- If a parameter type is omitted, the current legacy default is `shonkha`.
-- `ferot` is valid only inside a function body.
-- `khali` functions may use `ferot;` but may not return a value.
-- Non-`khali` functions must return a compatible expression.
-- Function calls are validated against parameter count and parameter types.
-
-### 4.4 Control-flow semantics
-
-- `jodi (...) { ... }` requires a `shotto` condition.
-- `jodi (...) { ... } naile { ... }` produces two branches and a merge point.
-- `jotokhon (...) { ... }` produces a loop header, body, and back-edge.
-- `ghurao (init; condition; step) { ... }` separates initialization, test, step, and body in the AST/TAC pipeline.
-
-## 5. Diagnostics Model
-
-Diamond distinguishes multiple error classes:
-
-| Class | Produced by | Example |
-|---|---|---|
-| `preprocess` | import/record lowering stage | unsupported record-typed function parameter |
-| `lexical` | lexer | unexpected character |
-| `syntax` | parser | missing semicolon / unexpected token |
-| `semantic` | semantic analysis | type mismatch, undeclared identifier, invalid return |
-| `io` / `request` / `internal` | driver/runtime environment | missing source, oversize input, internal failure |
-
-Runtime errors are separate from compilation diagnostics and are surfaced by the
-IDE interpreter/debugger with line-aware messages.
-
-## 6. Intermediate Representation and Optimization
-
-### 6.1 Raw TAC
-
-The first IR lowering produces three-address code with temporaries and labels.
-Representative operations include:
-
-- arithmetic and comparison operators
-- `ifFalse`, `goto`, `label`
-- `func`, `param`, `call`, `return`
-- `decl`, `decl_array`, `load_index`, `store_index`
-- `print`, `input`
-
-### 6.2 Optimization passes
-
-The current optimizer applies:
-
-- constant folding
-- strength reduction
-- common subexpression elimination
-- dead code elimination
-- unreachable code removal
-
-Both raw TAC and optimized TAC are preserved so they can be compared in the IDE
-and exported reports.
-
-## 7. Code Generation Target
-
-Diamond currently emits an educational pseudo-assembly target, not native
-machine code. This keeps the compiler easy to explain during demonstrations.
-
-Representative output:
-
-```text
-FUNC jog ; params=2
-ADD t1, a, b
-RET t1
-ENDFUNC jog
-PARAM 4
-PARAM 9
-CALL jog, 2 -> t2
-PRINT t2
-```
-
-Separate from this pedagogical target, the compiler implementation itself is
-also compiled to WebAssembly via Emscripten so the full front-end can run inside
-the browser-based IDE.
-
-## 8. Symbol Table and Memory Model
-
-The symbol table records:
-
-- symbol name
 - symbol kind
-- type
 - scope depth
 - declaration line
 - array size
-- activity state
-- builtin flag
-- parameter metadata
+- active or inactive scope status
+- built-in metadata
+- function parameter metadata
 - simulated memory address
 
-The memory model is educational rather than physical:
+The memory addresses are educational values, not real hardware addresses. They help students understand how variables can be tracked during execution and debugging.
 
-- stack-like scope entry/exit is simulated in `symtab.c`
-- variables and parameters receive monotonically assigned memory offsets
-- arrays reserve contiguous simulated slots
-- functions live at global scope
-- heap allocation is not part of the current language
+## 7. Intermediate Representation
 
-The IDE debugger complements this with:
+Diamond uses TAC as its instructional intermediate representation.
 
-- a call stack view
-- variable lifetime snapshots
-- per-step memory changes
+The pipeline exposes:
 
-## 9. Visualization Support
+- raw TAC before optimization reporting
+- optimized TAC after simplification passes
+- a pseudo-assembly listing for easy classroom explanation
 
-The project already exposes the major compiler-course artifacts:
+The implementation also reports optimization counts such as:
 
-- token stream
-- AST graph
-- flowchart / control-flow preview
-- symbol table
-- nested scope explorer
-- expected vs inferred type analysis
-- raw TAC and optimized TAC
-- pseudo-assembly
+- constant folds
+- strength reductions
+- common subexpression removals
+- dead code elimination
+- unreachable code removal
+
+## 8. Browser Execution Model
+
+The web IDE uses the following compile path priority:
+
+1. Web Worker WASM compiler
+2. main-thread WASM compiler
+3. backend API compilation
+4. demo fallback mode
+
+This layered approach improves reliability during live demonstrations.
+
+## 9. IDE Analysis And Runtime Layers
+
+The IDE is not only an editor. It also provides:
+
+- AST graph visualization
+- flowchart generation from the AST
+- token stream viewer
+- symbol and scope inspection
+- type inference and compatibility panel
+- IR and pseudo-assembly viewer
 - diagnostics panel
-- runtime debugger and memory panel
-- automated test-suite dashboard
+- runtime execution panel with stdin support
+- step debugger with memory and call-stack snapshots
+- built-in challenge mode and embedded test suite
 
-## 10. Current Limitations
+## 10. Backend Responsibilities
 
-These are the main known language/runtime limitations that should be presented
-honestly during evaluation:
+The Express backend exists mainly as a safe compilation fallback. It currently provides:
 
-- record values cannot yet be passed to or returned from functions directly
-- the pseudo-assembly target is instructional, not executable machine code
-- heap data structures are not implemented
-- module importing is preprocessing-based, not a separate linker stage
-- semantic analysis is integrated inside the parser actions rather than being a fully separate post-parse traversal
+- versioned compile endpoint at `/api/v1/compile`
+- health endpoints for liveness and readiness
+- input size limits
+- request rate limiting
+- concurrency limiting
+- temporary file management for compiler execution
+- production-oriented CORS and security middleware
 
-## 11. Verification Strategy
+## 11. Testing Strategy
 
-The repository validates the compiler through several layers:
+The project uses multiple verification layers:
 
-- native regression tests for the real C compiler
-- embedded IDE regression cases for compile + runtime behavior
-- Vitest unit tests for IDE utilities and reporting
+- native regression tests for the real compiler binary
+- unit tests for IDE logic
 - backend API tests
-- Playwright end-to-end IDE checks
+- Playwright end-to-end browser tests
+- built-in challenge and test-suite flows inside the IDE
 
-The native regression suite also writes machine-readable and markdown summaries
-under `diamond-compiler/tests/report/`.
+The native regression suite also writes a Markdown dashboard under `diamond-compiler/tests/report/dashboard.md`.
+
+## 12. Current Architectural Limits
+
+- semantic analysis is still closely tied to parser actions instead of a fully separate post-parse pass
+- record support is preprocessing-based and not yet a complete first-class data model
+- generated assembly is explanatory output, not executable machine code
+- imports are source expansion, not a full module linker stage
+
+## 13. Why This Architecture Fits An Academic Project
+
+The current architecture is strong for academic use because it keeps each compiler phase visible and explainable, while also showing how classic systems programming can integrate with modern web tooling through WebAssembly and React-based visualization.
