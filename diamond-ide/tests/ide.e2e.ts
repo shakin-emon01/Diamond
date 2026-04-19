@@ -84,6 +84,10 @@ test("analysis and challenge sections render live compiler data across the main 
 
   await page.getByRole("button", { name: /^IR \/ Codegen$/i }).click();
   await expect(page.getByText(/Intermediate Representation/i)).toBeVisible();
+  await page.getByRole("button", { name: /^Raw TAC$/i }).click();
+  await expect(page.getByRole("cell", { name: /^decl$/i }).first()).toBeVisible();
+  await page.getByRole("button", { name: /^Assembly$/i }).click();
+  await expect(page.locator("pre").first()).toContainText(/ALLOC number ; type=shonkha/i);
 
   await page.getByRole("button", { name: /^Diagnostics$/i }).click();
   await expect(page.getByText(/Diagnostics clear/i)).toBeVisible();
