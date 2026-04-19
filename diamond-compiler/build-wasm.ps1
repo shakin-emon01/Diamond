@@ -36,6 +36,81 @@ $frontends = @(
   (Join-Path $root "..\diamond-ide")
 )
 $workerTemplate = Join-Path $root "..\diamond-ide\scripts\diamond-wasm-worker.js"
+$manifestPath = Join-Path $coreDir "diamond-wasm-manifest.json"
+$manifestSourceFiles = @(
+  "parser.y",
+  "lexer.l",
+  "ast.c",
+  "ast.h",
+  "preprocess.c",
+  "preprocess.h",
+  "symtab.c",
+  "symtab.h",
+  "tac.c",
+  "tac.h",
+  "driver.c"
+)
+$compilerSources = @(
+  "lex.yy.c",
+  "parser.tab.c",
+  "ast.c",
+  "preprocess.c",
+  "symtab.c",
+  "tac.c",
+  "driver.c"
+)
+
+function Get-TextSha256($path) {
+  $sha256 = [System.Security.Cryptography.SHA256]::Create()
+
+  try {
+    $content = Get-Content -Path $path -Raw
+    $normalized = $content -replace "`r`n", "`n" -replace "`r", "`n"
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($normalized)
+    $hashBytes = $sha256.ComputeHash($bytes)
+    return ([System.BitConverter]::ToString($hashBytes)).Replace("-", "").ToLowerInvariant()
+  }
+  finally {
+    $sha256.Dispose()
+  }
+}
+
+function Write-WasmManifest() {
+  $sourceEntries = foreach ($relativePath in $manifestSourceFiles) {
+    $fullPath = Join-Path $coreDir $relativePath
+
+    if (!(Test-Path $fullPath)) {
+      throw "Missing compiler source file for WASM manifest: $fullPath"
+    }
+
+    [PSCustomObject]@{
+      path = ([System.IO.Path]::Combine("diamond-compiler", "core", $relativePath)) -replace "\\", "/"
+      sha256 = Get-TextSha256 $fullPath
+    }
+  }
+
+  $assetEntries = @(
+    [PSCustomObject]@{
+      path = "diamond-compiler/core/diamond.js"
+      sha256 = ((Get-FileHash (Join-Path $coreDir "diamond.js") -Algorithm SHA256).Hash).ToLowerInvariant()
+    },
+    [PSCustomObject]@{
+      path = "diamond-compiler/core/diamond.wasm"
+      sha256 = ((Get-FileHash (Join-Path $coreDir "diamond.wasm") -Algorithm SHA256).Hash).ToLowerInvariant()
+    }
+  )
+
+  $manifest = [PSCustomObject]@{
+    schemaVersion = 1
+    hashAlgorithm = "sha256"
+    textNormalization = "lf"
+    generatedAtUtc = [DateTime]::UtcNow.ToString("o")
+    sources = $sourceEntries
+    assets = $assetEntries
+  }
+
+  $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $manifestPath -Encoding UTF8
+}
 
 function Sync-FrontendArtifacts($frontendRoot) {
   if (!(Test-Path $frontendRoot)) {
@@ -66,7 +141,7 @@ try {
   & $bison -d parser.y
   & $flex lexer.l
 
-  & $emcc lex.yy.c parser.tab.c ast.c preprocess.c symtab.c tac.c driver.c `
+  & $emcc $compilerSources `
     -O2 `
     -DDIAMOND_WASM `
     -s EXPORTED_FUNCTIONS='["_diamond_compile","_diamond_free"]' `
@@ -80,6 +155,8 @@ try {
   if ($LASTEXITCODE -ne 0) {
     throw "emcc build failed."
   }
+
+  Write-WasmManifest
 
   if (-not $SkipCopy) {
     foreach ($frontend in $frontends) {

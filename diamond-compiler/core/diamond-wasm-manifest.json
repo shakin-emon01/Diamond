@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "hashAlgorithm": "sha256",
+  "textNormalization": "lf",
+  "generatedAtUtc": "2026-04-19T20:54:11.5553841Z",
+  "sources": [
+    {
+      "path": "diamond-compiler/core/parser.y",
+      "sha256": "b450cbdbc6dfbdc9fe9891f28cbacf7975ae92d31b354d22813978be8f45bc54"
+    },
+    {
+      "path": "diamond-compiler/core/lexer.l",
+      "sha256": "1c84a8aa8241930649e0fa4f9d9e16965c8f59be724076777131edff9ba5425d"
+    },
+    {
+      "path": "diamond-compiler/core/ast.c",
+      "sha256": "e83066df14c00f1004760db26ceb8705835c7d44041dbe5630f09b28c8408bbb"
+    },
+    {
+      "path": "diamond-compiler/core/ast.h",
+      "sha256": "58e7854ea5f2e9b197dade81c701643b0c26fd19810366afdfd97d46041181cf"
+    },
+    {
+      "path": "diamond-compiler/core/preprocess.c",
+      "sha256": "f0cd650d49fdee9b9f6a0977154762f10397cee2eaf57490fa80b422d33c9101"
+    },
+    {
+      "path": "diamond-compiler/core/preprocess.h",
+      "sha256": "e3227ef38c315d268bf8fd1e0a18371ed2403ea528310ff55ad0e11283384af4"
+    },
+    {
+      "path": "diamond-compiler/core/symtab.c",
+      "sha256": "12d095af0720e10a8ef473ca1256316bb6742bdad2a647c23ed53aeea7c8bd73"
+    },
+    {
+      "path": "diamond-compiler/core/symtab.h",
+      "sha256": "864aaf40b22d8d1c04ae0268371a9af4608c2d7481141ef5d32fd94f82480fdb"
+    },
+    {
+      "path": "diamond-compiler/core/tac.c",
+      "sha256": "f8390e7665577f4295b434fcc3a7b01a3eb9033ec7f5c0854179ddb9ee7aa6b0"
+    },
+    {
+      "path": "diamond-compiler/core/tac.h",
+      "sha256": "ad844301656fe9586965fbf7e95e502e7e75abd1be9f44a9a855b580613ee2d8"
+    },
+    {
+      "path": "diamond-compiler/core/driver.c",
+      "sha256": "59f2b30029b6900c74abc544df9c149b21a701bb0879d9fe053b59f7b4c5f5d0"
+    }
+  ],
+  "assets": [
+    {
+      "path": "diamond-compiler/core/diamond.js",
+      "sha256": "fef1b216b10df92a922ebcbf3605f482a7203b01c7d65c77dad6a40d41008147"
+    },
+    {
+      "path": "diamond-compiler/core/diamond.wasm",
+      "sha256": "faf65fe516ab27eb33ce8f4afd57522189af60449314e6f9e59bd269ef716a69"
+    }
+  ]
+}
